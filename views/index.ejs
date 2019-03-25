@@ -1,0 +1,97 @@
+<html>
+
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+
+<body>
+  <form action="/insert" method="post">
+    <label for="name">name</label>
+    <input id='nameInput' type="text" name='name'>
+    <label for="status">status</label>
+    <input id='statusInput' type="text" name='status'>
+    <input type="submit">
+  </form>
+  <button id="confirmUpdate" onclick="xacnhansua()">xac nhan sua</button>
+
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>stt</th>
+        <th>id</th>
+        <th>name</th>
+        <th>status</th>
+        <th>action</th>
+
+
+      </tr>
+    </thead>
+    <tbody>
+      <% todoItems.map((item,index)=>{%>
+      <tr>
+        <td><%- index%></td>
+        <td><%- item._id%></td>
+        <td><%- item.name%></td>
+        <td><%- item.status%></td>
+        <td>
+          <button type="button" data-toggle="modal" data-target="#showDetail" class="btn btn-success btn-icon-split"
+            onclick="xoa('<%-item._id%>')">
+            <span class="text">delete</span>
+          </button>
+          <button type="button" data-toggle="modal" data-target="#showDetail" class="btn btn-success btn-icon-split"
+            onclick="sua('<%-item._id%>')">
+            <span class="text">sua</span>
+          </button>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+  <script>
+    function xoa(id) {
+      console.log('xoa'); 1
+      let reqURL = '/delete/' + id;
+      console.log("TCL: xoa -> reqURL", reqURL)
+      $.ajax({
+        url: reqURL,
+        type: 'DELETE',
+        success: function (result) {
+          alert('xoa thanh cong');
+          window.location.reload();
+        }
+      });
+    }
+
+    function sua(id) {
+
+      //get data from server base on id
+      let reqURL = '/getById/' + id;
+      $.get(reqURL, function (data, status) {
+        //load data len o input
+        $('#nameInput').val(data.name);
+        $('#statusInput').val(data.status);
+      });
+
+      //gan idItem cho button xac nhan sua
+      $('#confirmUpdate').attr('id_item', id);
+
+    }
+
+    function xacnhansua() {
+      let reqURL='/update/'+$('#confirmUpdate').attr('id_item');
+      let name=$('#nameInput').val();
+      let status=$('#statusInput').val();
+      $.ajax({
+        url: reqURL,
+        type: 'PUT',
+        data: `name=${name}&status=${status}`,
+        success: function (data) {
+          window.location.reload();
+        }
+      });
+    }
+  </script>
+</body>
+
+</html>
